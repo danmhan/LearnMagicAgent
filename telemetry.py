@@ -3,6 +3,19 @@ import json
 import re
 from typing import Any, Dict
 
+# OpenTelemetry Imports
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExporter
+
+# Initialize OpenTelemetry
+provider = TracerProvider()
+processor = SimpleSpanProcessor(ConsoleSpanExporter())
+provider.add_span_processor(processor)
+trace.set_tracer_provider(provider)
+
+tracer = trace.get_tracer("learn_magic_agent.tracer")
+
 class PIIRedactingJSONFormatter(logging.Formatter):
     """
     A custom JSON formatter that structures log data and redacts basic PII

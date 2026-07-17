@@ -2,3 +2,6 @@ google-adk
 
 requests
 python-dotenv
+opentelemetry-api
+opentelemetry-sdk
+google-cloud-secret-manager

@@ -9,20 +9,20 @@ class SearchCardInput(BaseModel):
         description="The name of the Magic: The Gathering card to search for. Can be a partial name or slightly misspelled."
     )
 
-def search_mtg_card(card_name: str) -> str:
+def search_mtg_card(input_data: SearchCardInput) -> str:
     """
     Searches the Scryfall API for a Magic: The Gathering card by name and returns its Oracle text,
     mana cost, type line, and a summary.
     
     Args:
-        card_name: The name of the card to search for.
+        input_data: A SearchCardInput containing the name of the card to search for.
         
     Returns:
         A formatted string with the card's details, or an error message if not found.
     """
     try:
         # Use fuzzy search to allow for partial names or slight misspellings
-        query = urllib.parse.quote(card_name)
+        query = urllib.parse.quote(input_data.card_name)
         url = f"https://api.scryfall.com/cards/named?fuzzy={query}"
         
         response = requests.get(url)
@@ -47,9 +47,9 @@ def search_mtg_card(card_name: str) -> str:
                 
             return details
         elif response.status_code == 404:
-            return f"Card '{card_name}' not found. Please try checking the spelling or providing a more specific name."
+            return f"Card '{input_data.card_name}' not found. Please try checking the spelling or providing a more specific name."
         else:
-            return f"Error looking up card '{card_name}': API returned status {response.status_code}"
+            return f"Error looking up card '{input_data.card_name}': API returned status {response.status_code}"
             
     except Exception as e:
-        return f"An error occurred while searching for '{card_name}': {str(e)}"
+        return f"An error occurred while searching for '{input_data.card_name}': {str(e)}"

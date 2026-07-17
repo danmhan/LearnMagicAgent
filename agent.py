@@ -27,16 +27,29 @@ rules_judge_agent = adk.Agent(
     model="gemini-pro-latest",
 )
 
+POLICY_INSTRUCTION = """
+You are the Policy Guardrail Agent. Your job is to analyze the final output intended for the user.
+Ensure that the language is friendly, polite, and strictly related to Magic: The Gathering.
+If the response contains foul language or discusses harmful topics, replace the response with a polite warning.
+Otherwise, return the response as-is.
+"""
+
+policy_guardrail_agent = adk.Agent(
+    name="PolicyGuardrailAgent",
+    instruction=POLICY_INSTRUCTION,
+    model="gemini-1.5-flash",
+)
+
 COORDINATOR_INSTRUCTION = """
 You are the LearnMagic Coordinator. You are the main point of contact for the user.
 When a user asks a rules question, you should first ask the `CardResearcherAgent` to look up any specific cards mentioned.
 Then, you should ask the `RulesJudgeAgent` to explain the interaction based on the researched card text.
-Finally, synthesize the response in a friendly and welcoming manner.
+Finally, ask the `PolicyGuardrailAgent` to review your final response before showing it to the user.
 """
 
 learn_magic_agent = adk.Agent(
     name="LearnMagicAgent",
     instruction=COORDINATOR_INSTRUCTION,
-    sub_agents=[card_researcher_agent, rules_judge_agent],
-    model="gemini-flash-latest",
+    sub_agents=[card_researcher_agent, rules_judge_agent, policy_guardrail_agent],
+    model="gemini-1.5-flash",
 )
